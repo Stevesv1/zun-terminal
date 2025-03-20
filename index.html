@@ -3,453 +3,1756 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zun Terminal</title>
+    <title>Quick Mint</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
-        :root {
-            --text-color: #00ff00;
-            --terminal-bg: rgba(0, 0, 0, 0.85);
-            --terminal-header: #111111;
-            --green: #00ff00;
-            --bright-green: #33ff33;
-            --command-color: #fc1594;
-            --output-color: #cccccc;
-            --prompt-color: #ffcc00;
-            --error-color: #ff3333;
-            --scrollbar-track: #111111;
-            --scrollbar-thumb: #00ff00;
-            --scrollbar-thumb-hover: #33ff33;
-        }
-        
-        body, html {
-            font-family: 'Courier New', monospace;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            color: var(--text-color);
-            height: 100%;
-            overflow: hidden;
-        }
-        
-        #matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .terminal {
-            width: 800px;
-            height: 600px;
-            background-color: var(--terminal-bg);
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(240, 243, 37, 0.3);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .terminal-header {
-            background-color: var(--terminal-header);
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .terminal-dots {
-            display: flex;
-            margin-right: 15px;
-        }
-        
-        .dot {
-            height: 12px;
-            width: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        .dot-red { background-color: #ff5f56; }
-        .dot-yellow { background-color: #ffbd2e; }
-        .dot-green { background-color: #27c93f; }
-        
-        .terminal-title {
-            color: var(--output-color);
-            font-size: 14px;
-            flex-grow: 1;
-            text-align: center;
-        }
-        
-        .terminal-body {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            position: relative;
-        }
-        
-        .terminal-body::-webkit-scrollbar {
-            width: 10px;
-        }
-        
-        .terminal-body::-webkit-scrollbar-track {
-            background: var(--scrollbar-track);
-        }
-        
-        .terminal-body::-webkit-scrollbar-thumb {
-            background: var(--scrollbar-thumb);
-            border-radius: 5px;
-        }
-        
-        .terminal-body::-webkit-scrollbar-thumb:hover {
-            background: var(--scrollbar-thumb-hover);
-        }
-        
-        .boot-sequence {
-            white-space: pre-wrap;
-            color: var(--text-color);
-            margin-bottom: 20px;
-            font-size: 12px;
-        }
-        
-        .command-line {
-            margin-bottom: 10px;
-            white-space: pre-wrap;
-        }
-        
-        .prompt {
-            color: var(--prompt-color);
-        }
-        
-        .command {
-            color: var(--command-color);
-        }
-        
-        .output {
-            color: var(--output-color);
-            margin-left: 20px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-            line-height: 1.4;
-        }
-        
-        .error {
-            color: var(--error-color);
-            margin-left: 20px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-        }
-        
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 15px;
-            background-color: var(--text-color);
-            animation: blink 1s infinite;
-            vertical-align: middle;
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-        
-        .input-line {
-            display: flex;
-            align-items: center;
-        }
-        
-        #command-input {
-            background: transparent;
-            border: none;
-            color: var(--command-color);
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            outline: none;
-            flex-grow: 1;
-            padding: 0;
-            margin: 0;
-        }
-        
-        a {
-            color: var(--bright-green);
-            text-decoration: underline;
-        }
-        
-        a:hover {
-            color: white;
-        }
-        
-        .typing {
-            overflow: hidden;
-            border-right: .15em solid var(--text-color);
-            white-space: nowrap;
-            margin: 0;
-            animation: 
-                typing 1.5s steps(30, end),
-                blink-caret .75s step-end infinite;
-        }
-        
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-        
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: var(--text-color); }
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .ascii-art {
-            color: var(--bright-green);
-            font-size: 10px;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            white-space: pre;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-active: #4338ca;
+    --secondary-color: #a5b4fc;
+    --dark-color: #1e293b;
+    --light-color: #f8fafc;
+    --success-color: #10b981;
+    --success-hover: #059669;
+    --success-active: #047857;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --danger-hover: #dc2626;
+    --danger-disabled: #fca5a5;
+    --info-color: #3b82f6;
+    --info-hover: #2563eb;
+    --card-bg: #ffffff;
+    --border-radius: 12px;
+    --box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px; /* Base font size for consistent scaling */
+}
+
+body {
+    font-family: 'Lexend', sans-serif;
+    line-height: 1.6;
+    background-color: #f1f5f9;
+    background-image: 
+        radial-gradient(at 80% 10%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 20% 90%, rgba(16, 185, 129, 0.15) 0px, transparent 50%);
+    color: var(--dark-color);
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-size: 1rem; /* Default body font size */
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 5px;
+    transition: var(--transition);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    background-color: var(--card-bg);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 20px;
+        padding: 25px;
+    }
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    letter-spacing: -0.5px;
+    position: relative;
+    display: inline-block;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+    border-radius: 3px;
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+}
+
+.network-selector {
+    background-color: #f1f5f9;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.network-option {
+    padding: 12px 22px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    position: relative;
+    z-index: 1;
+    font-size: 0.95rem; /* Slightly reduced font size */
+}
+
+.network-option:hover {
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.network-option.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+}
+
+.form-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+    .form-container {
+        gap: 15px; /* Reduce gap on medium desktop screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .form-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+    .full-width {
+        grid-column: span 1;
+    }
+}
+
+.form-group {
+    margin-bottom: 5px;
+    position: relative;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    color: #94a3b8;
+    z-index: 1;
+    pointer-events: none;
+    transition: var(--transition);
+}
+
+input, select {
+    width: 100%;
+    padding: 14px 15px 14px 45px;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem; /* Standardized input font size */
+    transition: var(--transition);
+    color: #1e293b;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    line-height: 1.2; /* Prevent tall inputs */
+    height: auto; /* Let content define height */
+}
+
+input:focus, select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+}
+
+input:focus + .input-icon {
+    color: var(--primary-color);
+}
+
+input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+
+input[type="datetime-local"] {
+    padding-right: 10px;
+    font-size: 0.9rem; /* Slightly smaller font for date inputs */
+}
+
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.button-container {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+    .button-container {
+        flex-direction: column;
+    }
+}
+
+button {
+    flex: 1;
+    padding: 15px 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.95rem; /* Standardized button font size */
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+button:hover::before {
+    left: 100%;
+}
+
+button i {
+    font-size: 1.2rem;
+}
+
+.btn-simulate {
+    background-color: var(--info-color);
+    color: white;
+}
+
+.btn-simulate:hover {
+    background-color: var(--info-hover);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-execute {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-execute:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-execute:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-timed-mint {
+    background-color: var(--success-color);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-timed-mint:hover:not(:disabled) {
+    background-color: var(--success-hover);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-timed-mint:disabled {
+    background-color: var(--success-active);
+    cursor: not-allowed;
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+    }
+    50% {
+        box-shadow: 0 5px 25px rgba(16, 185, 129, 0.6);
+    }
+    100% {
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+    }
+}
+
+.btn-stop {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-stop:hover:not(:disabled) {
+    background-color: var(--danger-hover);
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-stop:disabled {
+    background-color: var(--danger-disabled);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.notice {
+    background-color: #fffbeb;
+    border-left: 4px solid var(--warning-color);
+    padding: 15px;
+    margin-top: 30px;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.notice::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(245, 158, 11, 0.1), transparent);
+}
+
+.advanced-options {
+    background-color: #f8fafc;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-top: 20px;
+    border: 1px solid #e2e8f0;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.advanced-options.active {
+    border-color: var(--secondary-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.toggle {
+    position: relative;
+    display: inline-block;
+    width: 54px;
+    height: 28px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-label {
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+.console-container {
+    margin-top: 30px;
+}
+
+.console-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.console-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+.console-actions button {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.console-actions button:hover {
+    background-color: #f1f5f9;
+    color: var(--primary-color);
+}
+
+.console {
+    background-color: #1e293b;
+    color: #f8fafc;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    height: 250px;
+    overflow-y: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    position: relative;
+    border: 1px solid #334155;
+}
+
+.console::-webkit-scrollbar {
+    width: 8px;
+}
+
+.console::-webkit-scrollbar-track {
+    background: #334155;
+    border-radius: 4px;
+}
+
+.console::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+.console::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
+.console p {
+    margin: 5px 0;
+    word-break: break-all;
+    position: relative;
+    padding-left: 15px;
+}
+
+.console p::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #64748b;
+}
+
+.console p.yellow { color: #fbbf24; }
+.console p.cyan { color: #22d3ee; }
+.console p.green { color: #34d399; }
+.console p.red { color: #f87171; }
+.console p.blue { color: #60a5fa; }
+.console p.purple { color: #a78bfa; }
+
+.info-icon {
+    color: var(--info-color);
+    margin-left: 5px;
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition);
+}
+
+.info-icon:hover {
+    color: var(--info-hover);
+    transform: scale(1.1);
+}
+
+.tooltip {
+    position: absolute;
+    top: -5px;
+    left: 125%;
+    visibility: hidden;
+    width: 250px;
+    background-color: #1e293b;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 12px;
+    z-index: 1;
+    opacity: 0;
+    transition: var(--transition);
+    font-size: 0.75rem;
+    font-weight: normal;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(10px);
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: -10px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #1e293b transparent transparent;
+}
+
+@media (max-width: 768px) {
+    .tooltip {
+        width: 200px;
+        left: auto;
+        right: 0;
+        top: 30px;
+    }
+    
+    .tooltip::before {
+        left: auto;
+        right: 10px;
+        top: -10px;
+        border-color: transparent transparent #1e293b transparent;
+    }
+}
+
+.info-icon:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+.mint-section {
+    background-color: #f8fafc;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    margin-top: 30px;
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.mint-section:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.mint-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--success-color), var(--primary-color));
+}
+
+.mint-title {
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+}
+
+.network-badge {
+    background-color: var(--success-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
+    transition: var(--transition);
+}
+
+.network-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+#customRpcContainer {
+    background-color: #f8fafc;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    border: 1px dashed #cbd5e1;
+    transition: var(--transition);
+}
+
+#customRpcContainer:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.clock-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.clock-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.clock-item:hover {
+    transform: translateY(-2px);
+}
+
+.clock-digit {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    width: 60px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.clock-digit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.clock-digit::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.clock-label {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-container, .mint-section, .console-container {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.form-container {
+    animation-delay: 0.1s;
+}
+
+.mint-section {
+    animation-delay: 0.2s;
+}
+
+.console-container {
+    animation-delay: 0.3s;
+}
+
+input:focus, select:focus, button:focus {
+    outline: none;
+}
+
+/* Media queries specific for desktop view */
+@media (min-width: 1025px) {
+    html {
+        font-size: 16px; /* Reset font size for desktop */
+    }
+    
+    .form-container {
+        gap: 20px; /* Ensure consistent spacing */
+    }
+    
+    input, select {
+        height: auto;
+        font-size: 0.95rem; /* Standardized input size */
+    }
+    
+    .form-group {
+        margin-bottom: 10px; /* Add a bit more spacing between form elements */
+    }
+}
+
+/* Fix for extra large desktop screens */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1200px; /* Wider container for very large screens */
+    }
+}
+
+/* Target specific browser zoom levels */
+@media screen and (min-resolution: 96dpi) {
+    input, select, button {
+        font-size: 0.95rem !important; /* Force consistent font size */
+    }
+}
+
+@media (max-width: 380px) {
+    .container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 1.75rem;
+    }
+    
+    .button-container {
+        flex-direction: column;
+    }
+    
+    .network-option {
+        padding: 10px 15px;
+        font-size: 0.875rem;
+    }
+}
     </style>
 </head>
 <body>
-    <canvas id="matrix-bg"></canvas>
-    
     <div class="container">
-        <div class="terminal">
-            <div class="terminal-header">
-                <div class="terminal-dots">
-                    <div class="dot dot-red"></div>
-                    <div class="dot dot-yellow"></div>
-                    <div class="dot dot-green"></div>
-                </div>
-                <div class="terminal-title">zun@terminal</div>
+        <header>
+            <h1>Quick Mint</h1>
+            <p class="subtitle">Mint NFTs with custom transaction parameters</p>
+        </header>
+
+        <div class="network-selector">
+            <div class="network-option active" data-network="mainnet">
+                <i class="fas fa-globe"></i> Ethereum Mainnet
             </div>
-            
-            <div class="terminal-body" id="terminal-body">
-                <div class="boot-sequence" id="boot-sequence"></div>
-                
-                <div class="input-line" id="input-line">
-                    <span class="prompt">zun@terminal:~$</span>&nbsp;
-                    <input type="text" id="command-input" autofocus spellcheck="false">
+            <div class="network-option" data-network="sepolia">
+                <i class="fas fa-flask"></i> Sepolia Testnet
+            </div>
+            <div class="network-option" data-network="custom">
+                <i class="fas fa-link"></i> Other EVM Chain
+            </div>
+        </div>
+
+        <div id="customRpcContainer" class="full-width" style="display: none; margin-bottom: 20px;">
+            <div class="form-group">
+                <label for="customRpcUrl">Custom RPC URL</label>
+                <div class="input-icon-wrapper">
+                    <span class="input-icon"><i class="fas fa-server"></i></span>
+                    <input type="text" id="customRpcUrl" placeholder="https://rpc.example.com" />
+                </div>
+            </div>
+            <div id="networkInfo" style="margin-top: 10px; display: none;">
+                <div class="network-badge">
+                    <i class="fas fa-check-circle"></i> 
+                    Connected to<span id="networkName">Unknown Network</span>
                 </div>
             </div>
         </div>
+
+        <div class="form-container">
+            <div class="form-group">
+                <label for="privateKey">
+                    Private Key 
+                    <span class="info-icon">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip">Your private key is processed locally and never sent to any server</span>
+                    </span>
+                </label>
+                <div class="input-icon-wrapper">
+                    <span class="input-icon"><i class="fas fa-key"></i></span>
+                    <input type="password" id="privateKey" placeholder="Enter your private key" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="contractAddress">NFT Contract Address</label>
+                <div class="input-icon-wrapper">
+                    <span class="input-icon"><i class="fas fa-file-contract"></i></span>
+                    <input type="text" id="contractAddress" placeholder="0x..." />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="dataHex">Data HEX Value</label>
+                <div class="input-icon-wrapper">
+                    <span class="input-icon"><i class="fas fa-code"></i></span>
+                    <input type="text" id="dataHex" placeholder="0x..." />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="value">Value to Send (ETH)</label>
+                <div class="input-icon-wrapper">
+                    <span class="input-icon"><i class="fab fa-ethereum"></i></span>
+                    <input type="number" id="value" placeholder="0.1" step="0.01" />
+                </div>
+            </div>
+
+            <div class="advanced-options full-width">
+                <div class="toggle-container">
+                    <label class="toggle">
+                        <input type="checkbox" id="advancedOptions">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Advanced Gas Options</span>
+                </div>
+
+                <div id="gasOptions" style="display: none;">
+                    <div class="form-container" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label for="maxPriorityFee">Max Priority Fee (GWEI)</label>
+                            <div class="input-icon-wrapper">
+                                <span class="input-icon"><i class="fas fa-tachometer-alt"></i></span>
+                                <input type="number" id="maxPriorityFee" placeholder="2"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="extraGas">Extra Gas Fee (GWEI)</label>
+                            <div class="input-icon-wrapper">
+                                <span class="input-icon"><i class="fas fa-gas-pump"></i></span>
+                                <input type="number" id="extraGas" placeholder="0"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-container full-width">
+                <button id="simulateBtn" class="btn-simulate">
+                    <i class="fas fa-vial"></i> Simulate Transaction
+                </button>
+                <button id="executeBtn" class="btn-execute" disabled>
+                    <i class="fas fa-rocket"></i> Execute Transaction
+                </button>
+            </div>
+        </div>
+
+        <div class="mint-section">
+            <div class="mint-title">
+                <i class="fas fa-stopwatch"></i> Timed Mint with Auto-Retry
+            </div>
+
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="mintDateTime">Mint Date and Time</label>
+                    <div class="input-icon-wrapper">
+                        <span class="input-icon"><i class="far fa-calendar-alt"></i></span>
+                        <input type="datetime-local" id="mintDateTime" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="retryDelay">Retry Delay (ms)</label>
+                    <div class="input-icon-wrapper">
+                        <span class="input-icon"><i class="fas fa-hourglass-half"></i></span>
+                        <input type="number" id="retryDelay" value="500" min="100" max="5000" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="countdown" style="display: none;">
+                <div class="clock-container">
+                    <div class="clock-item">
+                        <div class="clock-digit" id="days">00</div>
+                        <div class="clock-label">Days</div>
+                    </div>
+                    <div class="clock-item">
+                        <div class="clock-digit" id="hours">00</div>
+                        <div class="clock-label">Hours</div>
+                    </div>
+                    <div class="clock-item">
+                        <div class="clock-digit" id="minutes">00</div>
+                        <div class="clock-label">Minutes</div>
+                    </div>
+                    <div class="clock-item">
+                        <div class="clock-digit" id="seconds">00</div>
+                        <div class="clock-label">Seconds</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button id="startTimedMint" class="btn-timed-mint">
+                    <i class="fas fa-play-circle"></i> Start Timed Mint
+                </button>
+                <button id="stopTimedMint" class="btn-stop" disabled>
+                    <i class="fas fa-stop-circle"></i> Stop
+                </button>
+            </div>
+        </div>
+
+        <div class="notice">
+            <p><strong>Security Notice:</strong> Your private key is processed locally in your browser and is never sent to any server. Always verify contract addresses before submitting transactions.</p>
+        </div>
+
+        <div class="console-container">
+            <div class="console-header">
+                <div class="console-title">
+                    <i class="fas fa-terminal"></i> Console Output
+                </div>
+                <div class="console-actions">
+                    <button id="clearConsole"><i class="fas fa-trash"></i> Clear</button>
+                </div>
+            </div>
+            <div class="console" id="console"></div>
+        </div>
     </div>
-    
+
     <script>
-        const canvas = document.getElementById('matrix-bg');
-        const ctx = canvas.getContext('2d');
-        
-        canvas.height = window.innerHeight;
-        canvas.width = window.innerWidth;
-        
-        const characters = "ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ01234567890";
-        const fontSize = 14;
-        const columns = canvas.width / fontSize;
-        
-        const drops = [];
-        for (let i = 0; i < columns; i++) {
-            drops[i] = 1;
-        }
-        
-        function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const networkOptions = document.querySelectorAll('.network-option');
+    const privateKeyInput = document.getElementById('privateKey');
+    const contractAddressInput = document.getElementById('contractAddress');
+    const dataHexInput = document.getElementById('dataHex');
+    const valueInput = document.getElementById('value');
+    const advancedOptionsCheckbox = document.getElementById('advancedOptions');
+    const gasOptionsDiv = document.getElementById('gasOptions');
+    const maxPriorityFeeInput = document.getElementById('maxPriorityFee');
+    const extraGasInput = document.getElementById('extraGas');
+    const simulateBtn = document.getElementById('simulateBtn');
+    const executeBtn = document.getElementById('executeBtn');
+    const mintDateTimeInput = document.getElementById('mintDateTime');
+    const retryDelayInput = document.getElementById('retryDelay');
+    const startTimedMintBtn = document.getElementById('startTimedMint');
+    const stopTimedMintBtn = document.getElementById('stopTimedMint');
+    const countdownDiv = document.getElementById('countdown');
+    const daysSpan = document.getElementById('days');
+    const hoursSpan = document.getElementById('hours');
+    const minutesSpan = document.getElementById('minutes');
+    const secondsSpan = document.getElementById('seconds');
+    const consoleDiv = document.getElementById('console');
+    const clearConsoleBtn = document.getElementById('clearConsole');
+    const customRpcContainer = document.getElementById('customRpcContainer');
+    const customRpcUrlInput = document.getElementById('customRpcUrl');
+    const networkInfoDiv = document.getElementById('networkInfo');
+    const networkNameSpan = document.getElementById('networkName');
+    
+    let currentNetwork = 'mainnet';
+    let customRpcUrl = '';
+    let customNetworkName = 'Unknown Network';
+    let simulationSuccessful = false;
+    let txParams = null;
+    let timedMintActive = false;
+    let countdownInterval = null;
+    let mintTimeout = null;
+    let transactionSent = false;
+    let pendingTransaction = false;
+    let errorMessages = new Set();
+    let startTime = null;
+    let startBlock = null;
+    let web3Instance = null;
+    let lastValidCustomRpcUrl = '';
+    let mintInProgress = false;
+    let transactionHash = null;
+    
+    const updateDefaultMintTime = () => {
+        const now = new Date();
+        const timezoneOffset = now.getTimezoneOffset() * 60000;
+        const localISOTime = new Date(now.getTime() - timezoneOffset).toISOString().slice(0, 16);
+        mintDateTimeInput.value = localISOTime;
+    };
+    
+    updateDefaultMintTime();
+    
+    networkOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            networkOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            currentNetwork = this.dataset.network;
+            simulationSuccessful = false;
+            executeBtn.disabled = true;
+            resetWeb3Instance();
             
-            ctx.fillStyle = "#0f0";
-            ctx.font = fontSize + "px monospace";
-            
-            for (let i = 0; i < drops.length; i++) {
-                const text = characters.charAt(Math.floor(Math.random() * characters.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
+            if (currentNetwork === 'custom') {
+                customRpcContainer.style.display = 'block';
+                if (lastValidCustomRpcUrl) {
+                    customRpcUrl = lastValidCustomRpcUrl;
+                    customRpcUrlInput.value = lastValidCustomRpcUrl;
+                    networkInfoDiv.style.display = 'block';
+                } else {
+                    networkInfoDiv.style.display = 'none';
                 }
-                
-                drops[i]++;
+            } else {
+                customRpcContainer.style.display = 'none';
             }
+            
+            logWithColor('yellow', '🔄', `Switched to ${currentNetwork === 'custom' ? 'Custom EVM Chain' : currentNetwork}`);
+        });
+    });
+    
+    customRpcUrlInput.addEventListener('change', async function() {
+        customRpcUrl = this.value.trim();
+        networkInfoDiv.style.display = 'none';
+        
+        if (!customRpcUrl || !customRpcUrl.startsWith('http')) {
+            logWithColor('red', '❌', 'Please enter a valid RPC URL (http:// or https://)');
+            return;
         }
         
-        setInterval(drawMatrix, 33);
-        const bootSequence = document.getElementById('boot-sequence');
-        const terminalBody = document.getElementById('terminal-body');
-        const commandInput = document.getElementById('command-input');
-        const inputLine = document.getElementById('input-line');
-        
-        const bootText = `Initializing system...
-[OK] Kernel loaded
-[OK] Loading drivers
-[OK] Starting system services
-[OK] Network services initialized
-[OK] Security protocols enabled
-[OK] Matrix connection established
-[OK] Terminal ready
-
-███████╗██╗   ██╗███╗   ██╗    ████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗     
-╚══███╔╝██║   ██║████╗  ██║    ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║     
-  ███╔╝ ██║   ██║██╔██╗ ██║       ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║     
- ███╔╝  ██║   ██║██║╚██╗██║       ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║     
-███████╗╚██████╔╝██║ ╚████║       ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗
-╚══════╝ ╚═════╝ ╚═╝  ╚═══╝       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
-
-Welcome to Zun Terminal. Type 'help' for available commands.
-`;
-
-console.log(bootText);
-
-        let bootIndex = 0;
-        const typeBootSequence = () => {
-            if (bootIndex < bootText.length) {
-                bootSequence.textContent += bootText.charAt(bootIndex);
-                bootIndex++;
-                setTimeout(typeBootSequence, Math.random() * 5 + 5);
+        try {
+            logWithColor('blue', '🔄', 'Connecting to custom RPC...');
+            resetWeb3Instance();
+            const web3 = new Web3(new Web3.providers.HttpProvider(customRpcUrl));
+            const chainId = await web3.eth.getChainId();
+            const networkId = await web3.eth.net.getId();
+            let networkName = await getNetworkName(chainId);
+            if (networkName) {
+                customNetworkName = networkName;
             } else {
-                commandInput.focus();
+                customNetworkName = `Chain ID : ${chainId}`;
             }
+            
+            networkNameSpan.textContent = customNetworkName;
+            networkInfoDiv.style.display = 'block';
+            logWithColor('green', '✅', `Connected to ${customNetworkName}`);
+            lastValidCustomRpcUrl = customRpcUrl;
+        } catch (error) {
+            logWithColor('red', '❌', `Failed to connect to RPC: ${error.message}`);
+        }
+    });
+    
+    async function getNetworkName(chainId) {
+        const networks = {
+            1: 'Ethereum Mainnet',
+            5: 'Goerli Testnet',
+            11155111: 'Sepolia Testnet',
+            56: 'BNB Smart Chain',
+            137: 'Polygon Mainnet',
+            42161: 'Arbitrum One',
+            10: 'Optimism',
+            43114: 'Avalanche C-Chain',
+            8453: 'Base',
+            100: 'Gnosis Chain',
+            1101: 'Polygon zkEVM',
+            42220: 'Celo',
+            250: 'Fantom Opera',
+            25: 'Cronos Mainnet',
+            1285: 'Moonriver',
+            1284: 'Moonbeam',
+            30: 'RSK Mainnet',
+            1666600000: 'Harmony Shard 0',
+            2020: 'Ronin',
+            1088: 'Metis Andromeda',
+            288: 'Boba Network',
+            592: 'Astar',
+            128: 'Huobi ECO Chain',
+            1313161554: 'Aurora',
+            122: 'Fuse',
+            2001: 'Milkomeda C1'
         };
         
-        typeBootSequence();
-        
-
-commands = {
-    'help': {
-        description: 'Show available commands',
-        action: function() {
-            return `Available commands:
-  help           Show this help message
-  whoami         Display information about Zun
-  cat about.txt  Show detailed about information
-  social         Display social media links
-  clear          Clear the terminal
-  exit           Exit the terminal (reload page)`;
-        }
-    },
-    'whoami': {
-        description: 'Display information about Zun',
-        action: function() {
-            return `Name: Zun`;
-        }
-    },
-    'cat about.txt': {
-        description: 'Show detailed about information',
-        action: function() {
-            return `Hello there! I'm Zun, a crypto content creator and technology enthusiast.
-                    
-I love posting about crypto, covering early-stage projects, and sometimes diving into crypto-related development tasks.
-
-My journey started with airdrops, and now I explore the evolving blockchain ecosystem, sharing insights and opportunities along the way.
-
-From DeFi to zk-tech, I'm always on the lookout for innovative projects and ways to contribute to the space.
-
-Whether it's writing, coding, or experimenting with the latest crypto tools, I'm all in!`;
-        }
-    },
-    'social': {
-        description: 'Display social media links',
-        action: function() {
-            return `Twitter: <a href="https://x.com/Zun2025" target="_blank">Zun2025</a>
-Telegram: <a href="https://t.me/ZunXBT" target="_blank">ZunXBT</a>`;
-        }
-    },
-'clear': {
-    description: 'Clear the terminal',
-    action: function() {
-        terminalBody.innerHTML = '';
-        terminalBody.appendChild(bootSequence);
-        const newInputLine = document.createElement('div');
-        newInputLine.className = 'input-line';
-        newInputLine.id = 'input-line';
-        newInputLine.innerHTML = '<span class="prompt">zun@matrix:~$</span>&nbsp;<input type="text" id="command-input" autofocus spellcheck="false">';
-        terminalBody.appendChild(newInputLine);
-        const newCommandInput = document.getElementById('command-input');
-        newCommandInput.value = '';
-        newCommandInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const command = this.value.trim();
-                processCommand(command);
-                this.value = ''; 
-            }
-        });
-
-        newCommandInput.focus();
-        commandInput = newCommandInput;
-
-        return '';
+        return networks[chainId] || null;
     }
-},
-    'exit': {
-        description: 'Exit the terminal',
-        action: function() {
+    
+    advancedOptionsCheckbox.addEventListener('change', function() {
+        gasOptionsDiv.style.display = this.checked ? 'block' : 'none';
+        document.querySelector('.advanced-options').classList.toggle('active', this.checked);
+        if (this.checked) {
+            if (!maxPriorityFeeInput.value) maxPriorityFeeInput.value = '2';
+            if (!extraGasInput.value) extraGasInput.value = '0';
+        } else {
+            maxPriorityFeeInput.value = '';
+            extraGasInput.value = '';
+        }
+    });
+    
+    clearConsoleBtn.addEventListener('click', function() {
+        consoleDiv.innerHTML = '';
+        errorMessages.clear();
+    });
+    
+    const logToConsole = (message, color = '') => {
+        const p = document.createElement('p');
+        if (color) p.className = color;
+        p.innerHTML = message;
+        consoleDiv.appendChild(p);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    };
+    
+    const logWithColor = (color, emoji, message) => {
+        logToConsole(`${emoji} ${message}`, color);
+    };
+    
+    const logError = (message) => {
+        if (!errorMessages.has(message)) {
+            logWithColor('red', '❌', message);
+            errorMessages.add(message);
             setTimeout(() => {
-                location.reload();
-            }, 1000);
-            return 'Exiting terminal...';
+                errorMessages.delete(message);
+            }, 5000);
+        }
+    };
+    
+    const validateInputs = () => {
+        let isValid = true;
+        errorMessages.clear();
+        
+        if (!privateKeyInput.value) {
+            logError('Please enter your private key');
+            isValid = false;
+        }
+        
+        if (!contractAddressInput.value || !contractAddressInput.value.startsWith('0x')) {
+            logError('Please enter a valid contract address');
+            isValid = false;
+        }
+        
+        if (!dataHexInput.value || !dataHexInput.value.startsWith('0x')) {
+            logError('Please enter valid HEX data');
+            isValid = false;
+        }
+        
+        if (valueInput.value === '' || (parseFloat(valueInput.value) < 0)) {
+            logError('Please enter a valid ETH value (0 or positive number)');
+            isValid = false;
+        }
+        
+        if (currentNetwork === 'custom' && (!customRpcUrl || !customRpcUrl.startsWith('http'))) {
+            logError('Please enter a valid custom RPC URL');
+            isValid = false;
+        }
+        
+        return isValid;
+    };
+    
+    const getRpcUrl = () => {
+        if (currentNetwork === 'custom') {
+            return customRpcUrl;
+        }
+        return currentNetwork === 'mainnet' ? 'https://eth.llamarpc.com' : 'https://sepolia.drpc.org';
+    };
+    
+    const formatTimeValue = (value) => {
+        return value < 10 ? `0${value}` : value;
+    };
+    
+    const updateCountdown = () => {
+        const now = Date.now();
+        const mintTime = new Date(mintDateTimeInput.value).getTime();
+        const timeLeft = mintTime - now;
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            daysSpan.textContent = '00';
+            hoursSpan.textContent = '00';
+            minutesSpan.textContent = '00';
+            secondsSpan.textContent = '00';
+            countdownDiv.style.display = 'none';
+            if (timedMintActive && !mintInProgress) {
+                startMintProcess();
+            }
+            return;
+        }
+        
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        
+        daysSpan.textContent = formatTimeValue(days);
+        hoursSpan.textContent = formatTimeValue(hours);
+        minutesSpan.textContent = formatTimeValue(minutes);
+        secondsSpan.textContent = formatTimeValue(seconds);
+    };
+    
+    const getWeb3Instance = () => {
+        if (!web3Instance) {
+            const rpcUrl = getRpcUrl();
+            web3Instance = new Web3(new Web3.providers.HttpProvider(rpcUrl, {
+                timeout: 30000,
+                reconnect: {
+                    auto: true,
+                    delay: 1000,
+                    maxAttempts: 5
+                }
+            }));
+        }
+        return web3Instance;
+    };
+    
+    const resetWeb3Instance = () => {
+        web3Instance = null;
+        transactionHash = null;
+    };
+    
+    const simulateTransaction = async (isTimed = false) => {
+        if (!validateInputs()) throw new Error('Invalid inputs');
+        const web3 = getWeb3Instance();
+        
+        try {
+            const account = web3.eth.accounts.privateKeyToAccount(privateKeyInput.value);
+            web3.eth.accounts.wallet.add(account);
+            
+            const valueWei = web3.utils.toWei(valueInput.value || '0', 'ether');
+            let latestBlock;
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    latestBlock = await web3.eth.getBlock('latest');
+                    break;
+                } catch (err) {
+                    if (attempt === 2) throw new Error(`Failed to fetch latest block: ${err.message}`);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            
+            startBlock = latestBlock.number;
+            const supportsEIP1559 = latestBlock.baseFeePerGas !== undefined;
+            let txParams;
+            let gasFeesEth = '0';
+            
+            if (supportsEIP1559) {
+                const baseFeePerGas = latestBlock.baseFeePerGas.toString();
+                
+                let maxPriorityFeePerGas, extraGasWei;
+                if (advancedOptionsCheckbox.checked) {
+                    const maxPriorityFee = maxPriorityFeeInput.value || '2';
+                    const extraGas = extraGasInput.value || '0';
+                    maxPriorityFeePerGas = web3.utils.toWei(maxPriorityFee, 'gwei');
+                    extraGasWei = web3.utils.toWei(extraGas, 'gwei');
+                } else {
+                    maxPriorityFeePerGas = web3.utils.toWei('2', 'gwei');
+                    extraGasWei = '0';
+                }
+                
+                const baseFeePerGasBN = web3.utils.toBN(baseFeePerGas);
+                const maxPriorityFeePerGasBN = web3.utils.toBN(maxPriorityFeePerGas);
+                const extraGasBN = web3.utils.toBN(extraGasWei);
+                const maxFeePerGasBN = baseFeePerGasBN.add(maxPriorityFeePerGasBN).add(extraGasBN);
+                const maxFeePerGas = maxFeePerGasBN.toString();
+                
+                if (!isTimed) {
+                    logWithColor('cyan', '📊', 'Gas info (EIP-1559):');
+                    logToConsole(`  Base fee per gas: ${web3.utils.fromWei(baseFeePerGas, 'gwei')} GWEI`);
+                    logToConsole(`  Max priority fee per gas: ${web3.utils.fromWei(maxPriorityFeePerGas, 'gwei')} GWEI`);
+                    logToConsole(`  Extra gas fee: ${web3.utils.fromWei(extraGasWei, 'gwei')} GWEI`);
+                    logToConsole(`  Max fee per gas: ${web3.utils.fromWei(maxFeePerGas, 'gwei')} GWEI`);
+                }
+                
+                const txForEstimate = {
+                    from: account.address,
+                    to: contractAddressInput.value,
+                    value: valueWei,
+                    data: dataHexInput.value,
+                    maxFeePerGas,
+                    maxPriorityFeePerGas,
+                };
+                
+                let estimatedGas;
+                try {
+                    estimatedGas = await web3.eth.estimateGas(txForEstimate);
+                } catch (err) {
+                    throw new Error(`Gas estimation failed: ${err.message}`);
+                }
+                
+                let nonce;
+                try {
+                    nonce = await web3.eth.getTransactionCount(account.address, 'pending');
+                } catch (err) {
+                    throw new Error(`Failed to get nonce: ${err.message}`);
+                }
+                
+                const gasFeesWei = web3.utils.toBN(maxFeePerGas).mul(web3.utils.toBN(estimatedGas));
+                gasFeesEth = web3.utils.fromWei(gasFeesWei, 'ether');
+                
+                txParams = {
+                    from: account.address,
+                    to: contractAddressInput.value,
+                    value: valueWei,
+                    data: dataHexInput.value,
+                    maxFeePerGas,
+                    maxPriorityFeePerGas,
+                    gas: Math.floor(estimatedGas * 1.1).toString(),
+                    nonce,
+                };
+            } else {
+                let gasPrice;
+                if (advancedOptionsCheckbox.checked) {
+                    const baseGasPrice = await web3.eth.getGasPrice();
+                    const extraGas = extraGasInput.value || '0';
+                    const extraGasWei = web3.utils.toWei(extraGas, 'gwei');
+                    gasPrice = web3.utils.toBN(baseGasPrice).add(web3.utils.toBN(extraGasWei)).toString();
+                } else {
+                    gasPrice = await web3.eth.getGasPrice();
+                }
+                
+                if (!isTimed) {
+                    logWithColor('cyan', '📊', 'Gas info (Legacy):');
+                    logToConsole(`  Gas price: ${web3.utils.fromWei(gasPrice, 'gwei')} GWEI`);
+                }
+                
+                const txForEstimate = {
+                    from: account.address,
+                    to: contractAddressInput.value,
+                    value: valueWei,
+                    data: dataHexInput.value,
+                    gasPrice,
+                };
+                
+                let estimatedGas;
+                try {
+                    estimatedGas = await web3.eth.estimateGas(txForEstimate);
+                } catch (err) {
+                    throw new Error(`Gas estimation failed: ${err.message}`);
+                }
+                
+                let nonce;
+                try {
+                    nonce = await web3.eth.getTransactionCount(account.address, 'pending');
+                } catch (err) {
+                    throw new Error(`Failed to get nonce: ${err.message}`);
+                }
+                
+                const gasFeesWei = web3.utils.toBN(gasPrice).mul(web3.utils.toBN(estimatedGas));
+                gasFeesEth = web3.utils.fromWei(gasFeesWei, 'ether');
+                
+                txParams = {
+                    from: account.address,
+                    to: contractAddressInput.value,
+                    value: valueWei,
+                    data: dataHexInput.value,
+                    gasPrice,
+                    gas: Math.floor(estimatedGas * 1.1).toString(),
+                    nonce,
+                };
+            }
+            
+            if (!isTimed) {
+                logWithColor('green', '✅', `Simulation successful. Estimated gas: ${txParams.gas}`);
+                const mintValueEth = valueInput.value || '0';
+                logWithColor('purple', '💰', `Total Mint Fee: ${gasFeesEth} ETH + ${mintValueEth} ETH`);
+                const chainId = await web3.eth.getChainId();
+                const networkName = currentNetwork === 'custom' ? customNetworkName : (currentNetwork === 'mainnet' ? 'Ethereum Mainnet' : 'Sepolia Testnet');
+                logWithColor('blue', 'ℹ️', `Network: ${networkName} (Chain ID : ${chainId})`);
+            }
+            txParams.gasFeesEth = gasFeesEth;
+            
+            return txParams;
+        } catch (error) {
+            throw new Error(`Simulation error: ${error.message}`);
+        }
+    };
+    
+    const executeTransaction = async (txParams, isTimedMint = false) => {
+        if (transactionSent && pendingTransaction) {
+            return false;
+        }
+        
+        if (isTimedMint && transactionHash) {
+            logWithColor('yellow', '⚠️', 'Transaction already sent, waiting for confirmation...');
+            return false;
+        }
+        
+        const web3 = getWeb3Instance();
+        
+        try {
+            web3.eth.accounts.wallet.clear();
+            const account = web3.eth.accounts.privateKeyToAccount(privateKeyInput.value);
+            web3.eth.accounts.wallet.add(account);
+            
+            startTime = Date.now();
+            pendingTransaction = true;
+            
+            const networkName = currentNetwork === 'custom' ? customNetworkName : (currentNetwork === 'mainnet' ? 'Ethereum Mainnet' : 'Sepolia Testnet');
+            logWithColor('blue', '🚀', `Mint started on ${networkName} at block ${startBlock}`);
+            
+            return new Promise((resolve, reject) => {
+                web3.eth.sendTransaction(txParams)
+                    .on('transactionHash', hash => {
+                        transactionHash = hash;
+                        logWithColor('blue', '🔗', `Transaction hash: ${hash}`);
+                        transactionSent = true;
+                        
+                        if (timedMintActive && isTimedMint) {
+                            logWithColor('green', '✅', 'Transaction sent successfully. Stopping timed mint.');
+                            stopTimedMint();
+                        }
+                    })
+                    .on('receipt', receipt => {
+                        const confirmationTime = ((Date.now() - startTime) / 1000).toFixed(2);
+                        logWithColor('green', '🎉', 'Transaction confirmed!');
+                        logWithColor('cyan', '📋', `Minting transaction confirmed at block ${receipt.blockNumber}`);
+                        logWithColor('cyan', '⏱️', `Took ${confirmationTime} sec to confirm this mint`);
+    
+                        const mintValueEth = valueInput.value || '0';
+                        logWithColor('purple', '💰', `Total Mint Fee: ${txParams.gasFeesEth} ETH + ${mintValueEth} ETH`);
+                        
+                        pendingTransaction = false;
+                        mintInProgress = false;
+                        resolve(true);
+                    })
+                    .on('error', error => {
+                        if (error.message.includes('receipt') && transactionHash) {
+                            logWithColor('yellow', '⚠️', `Transaction receipt error, checking transaction status separately...`);
+                            setTimeout(() => checkTransactionStatus(transactionHash, txParams), 5000);
+                            resolve(true);
+                        } else {
+                            logWithColor('red', '❌', `Transaction failed: ${error.message}`);
+                            transactionSent = false;
+                            pendingTransaction = false;
+                            mintInProgress = false;
+                            if (!transactionHash || !error.message.includes('receipt')) {
+                                transactionHash = null;
+                            }
+                            reject(error);
+                        }
+                    });
+            });
+        } catch (error) {
+            pendingTransaction = false;
+            mintInProgress = false;
+            logWithColor('red', '❌', `Transaction execution error: ${error.message}`);
+            return false;
+        }
+    };
+    
+    async function checkTransactionStatus(hash, txParams) {
+        if (!hash) return;
+        
+        const web3 = getWeb3Instance();
+        try {
+            const receipt = await web3.eth.getTransactionReceipt(hash);
+            
+            if (receipt) {
+                const confirmationTime = ((Date.now() - startTime) / 1000).toFixed(2);
+                logWithColor('green', '🎉', 'Transaction confirmed!');
+                logWithColor('cyan', '📋', `Minting transaction confirmed at block ${receipt.blockNumber}`);
+                logWithColor('cyan', '⏱️', `Took ${confirmationTime} sec to confirm this mint`);
+    
+                const mintValueEth = valueInput.value || '0';
+                logWithColor('purple', '💰', `Total Mint Fee: ${txParams.gasFeesEth} ETH + ${mintValueEth} ETH`);
+                
+                pendingTransaction = false;
+                mintInProgress = false;
+            } else {
+                logWithColor('yellow', '⏳', 'Transaction still pending, will check again...');
+                setTimeout(() => checkTransactionStatus(hash, txParams), 5000);
+            }
+        } catch (error) {
+            logWithColor('yellow', '⚠️', `Error checking transaction: ${error.message}, will try again...`);
+            setTimeout(() => checkTransactionStatus(hash, txParams), 5000);
         }
     }
-};
+    
+    simulateBtn.addEventListener('click', async () => {
+        const originalContent = simulateBtn.innerHTML;
+        simulateBtn.innerHTML = '<div class="loading"></div> Simulating...';
+        simulateBtn.disabled = true;
+        executeBtn.disabled = true;
+        simulationSuccessful = false;
         
-        function processCommand(cmd) {
-            const commandLine = document.createElement('div');
-            commandLine.className = 'command-line';
-            commandLine.innerHTML = `<span class="prompt">zun@matrix:~$</span> <span class="command">${cmd}</span>`;
-            
-            const outputElement = document.createElement('div');
-            
-            if (cmd.trim() === '') {
-            } else if (commands[cmd.trim()]) {
-                const result = commands[cmd.trim()].action();
-                
-                if (cmd.trim() !== 'clear') {
-                    outputElement.className = 'output';
-                    outputElement.innerHTML = result;
-                    
-                    const currentInputLine = document.querySelector('.input-line');
-                    terminalBody.insertBefore(commandLine, currentInputLine);
-                    terminalBody.insertBefore(outputElement, currentInputLine);
-                }
-            } else {
-                outputElement.className = 'error';
-                outputElement.textContent = `Command not found: ${cmd}. Type 'help' for available commands.`;
-                
-                const currentInputLine = document.querySelector('.input-line');
-                terminalBody.insertBefore(commandLine, currentInputLine);
-                terminalBody.insertBefore(outputElement, currentInputLine);
-            }
-            
-            commandInput.value = '';
-            commandInput.focus();
-            terminalBody.scrollTop = terminalBody.scrollHeight;
+        try {
+            txParams = await simulateTransaction(false);
+            simulationSuccessful = true;
+            executeBtn.disabled = false;
+        } catch (error) {
+            logWithColor('red', '❌', `Simulation failed: ${error.message}`);
+        } finally {
+            simulateBtn.innerHTML = originalContent;
+            simulateBtn.disabled = false;
+        }
+    });
+    
+    executeBtn.addEventListener('click', async () => {
+        if (!simulationSuccessful || !txParams) {
+            logWithColor('red', '❌', 'Please simulate the transaction first');
+            return;
         }
         
-        commandInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const command = this.value;
-                processCommand(command);
-            }
-        });
+        const originalContent = executeBtn.innerHTML;
+        executeBtn.innerHTML = '<div class="loading"></div> Executing...';
+        executeBtn.disabled = true;
+        simulateBtn.disabled = true;
         
-        document.addEventListener('click', function() {
-            commandInput.focus();
-        });
-
-        window.addEventListener('resize', function() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+        try {
+            transactionSent = false;
+            pendingTransaction = false;
+            transactionHash = null;
+            
+            await executeTransaction(txParams, false);
+        } catch (error) {
+            logWithColor('red', '❌', `Transaction failed: ${error.message}`);
+        } finally {
+            executeBtn.innerHTML = originalContent;
+            executeBtn.disabled = simulationSuccessful ? false : true;
+            simulateBtn.disabled = false;
+        }
+    });
+    
+    const startMintProcess = async () => {
+        if (mintInProgress) {
+            logWithColor('yellow', '⚠️', 'Mint already in progress, ignoring duplicate start request');
+            return;
+        }
+        
+        mintInProgress = true;
+        
+        if (!validateInputs()) {
+            logWithColor('red', '❌', 'Cannot start timed mint - please check your inputs');
+            stopTimedMint();
+            mintInProgress = false;
+            return;
+        }
+        
+        logWithColor('green', '⏰', 'Mint time reached. Starting minting process...');
+        countdownDiv.style.display = 'none';
+        transactionSent = false;
+        pendingTransaction = false;
+        transactionHash = null;
+        
+        try {
+            const attemptMint = async () => {
+                if (!timedMintActive || transactionSent) {
+                    mintInProgress = false;
+                    return;
+                }
+                
+                try {
+                    const txParams = await simulateTransaction(true);
+                    const success = await executeTransaction(txParams, true);
+                    if (!success && timedMintActive && !transactionSent) {
+                        if (!transactionHash) {
+                            setTimeout(attemptMint, Math.max(100, parseInt(retryDelayInput.value) || 1000));
+                        } else {
+                            logWithColor('yellow', '⏳', 'Transaction sent, waiting for confirmation...');
+                        }
+                    }
+                } catch (error) {
+                    logWithColor('red', '❌', `Mint attempt failed: ${error.message}`);
+                    if (timedMintActive && !transactionSent && !transactionHash) {
+                        setTimeout(attemptMint, Math.max(100, parseInt(retryDelayInput.value) || 1000));
+                    }
+                }
+            };
+            await attemptMint();
+        } catch (error) {
+            logWithColor('red', '❌', `Minting process error: ${error.message}`);
+            mintInProgress = false;
+            if (!transactionSent && !transactionHash) {
+                stopTimedMint();
+            }
+        }
+    };
+    
+    const stopTimedMint = () => {
+        timedMintActive = false;
+        if (countdownInterval) clearInterval(countdownInterval);
+        if (mintTimeout) clearTimeout(mintTimeout);
+        countdownDiv.style.display = 'none';
+        startTimedMintBtn.disabled = false;
+        stopTimedMintBtn.disabled = true;
+        logWithColor('yellow', '🛑', 'Timed mint stopped');
+    };
+    
+    startTimedMintBtn.addEventListener('click', () => {
+        if (timedMintActive) {
+            logWithColor('red', '❌', 'Timed mint is already active');
+            return;
+        }
+        
+        if (!validateInputs()) {
+            logWithColor('red', '❌', 'Cannot start timed mint - please check your inputs');
+            return;
+        }
+        
+        const mintTime = new Date(mintDateTimeInput.value).getTime();
+        if (isNaN(mintTime)) {
+            logWithColor('red', '❌', 'Please select a valid mint date and time');
+            return;
+        }
+        
+        transactionHash = null;
+        timedMintActive = true;
+        transactionSent = false;
+        pendingTransaction = false;
+        mintInProgress = false;
+        startTimedMintBtn.disabled = true;
+        stopTimedMintBtn.disabled = false;
+        
+        const now = Date.now();
+        const delay = mintTime - now;
+        updateCountdown();
+        countdownInterval = setInterval(updateCountdown, 1000);
+        countdownDiv.style.display = 'block';
+        
+        if (delay <= 0) {
+            if (!mintInProgress) {
+                startMintProcess();
+            }
+        } else {
+            mintTimeout = setTimeout(() => {
+                if (!mintInProgress) {
+                    startMintProcess();
+                }
+            }, delay);
+        }
+    });
+    
+    stopTimedMintBtn.addEventListener('click', stopTimedMint);
+    window.addEventListener('load', updateDefaultMintTime);
     </script>
 </body>
 </html>
