@@ -21,7 +21,11 @@
             color: #fff;
             background: #041e42;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
         }
 
         .water-background {
@@ -59,48 +63,25 @@
         }
         
         @keyframes waveAnimation {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .glass-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            margin: 40px auto;
-            overflow: hidden;
-            padding: 30px;
-        }
-
-        .desktop-content {
-            display: none;
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         .mobile-error {
-            display: flex;
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
+            width: 100vw;
             padding: 20px;
             text-align: center;
             background: rgba(4, 30, 66, 0.5);
             backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
         }
 
         .error-icon {
@@ -112,7 +93,7 @@
         }
 
         .error-title {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             margin-bottom: 15px;
             background: linear-gradient(90deg, #64e5ff, #2a93d5);
@@ -123,7 +104,7 @@
         }
 
         .error-message {
-            font-size: 18px;
+            font-size: 20px;
             line-height: 1.6;
             margin-bottom: 20px;
             color: #fff;
@@ -139,39 +120,85 @@
         }
 
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-30px);
-            }
-            60% {
-                transform: translateY(-15px);
-            }
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
         }
 
         @keyframes wiggle {
-            0%, 100% {
-                transform: rotate(0deg);
-            }
-            25% {
-                transform: rotate(15deg);
-            }
-            75% {
-                transform: rotate(-15deg);
-            }
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(15deg); }
+            75% { transform: rotate(-15deg); }
         }
 
-        header {
-            padding: 20px 0;
+        .book-container {
+            width: 80vw;
+            height: 80vh;
+            perspective: 2000px;
+            position: relative;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
         }
 
-        .logo {
-            font-size: 32px;
-            font-weight: 700;
+        .book {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-origin: left center;
+            transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+            color: #fff;
+            background: rgba(16, 65, 128, 0.8);
+            box-shadow: 0 0 30px rgba(100, 229, 255, 0.6);
+            border-radius: 12px;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(100, 229, 255, 0.3);
+            overflow: auto;
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        .page.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .page.prev {
+            transform: translateX(-100%);
+        }
+
+        .page.next {
+            transform: translateX(100%);
+        }
+
+        .page-content {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 600;
+            margin-bottom: 30px;
             background: linear-gradient(90deg, #64e5ff, #2a93d5);
             background-clip: text;
             -webkit-background-clip: text;
@@ -180,13 +207,40 @@
             text-shadow: 0 0 10px rgba(100, 229, 255, 0.5);
         }
 
-        .music-button {
+        .page-subtitle {
+            font-size: 24px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #e0e0e0;
+        }
+
+        .gradient-bar {
+            height: 6px;
+            width: 120px;
+            background: linear-gradient(90deg, #64e5ff, #2a93d5);
+            margin: 0 auto 30px;
+            border-radius: 3px;
+            box-shadow: 0 0 15px rgba(100, 229, 255, 0.7);
+        }
+
+        .turn-buttons {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 100;
+        }
+
+        .turn-btn {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 30px;
             font-weight: 500;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -196,112 +250,74 @@
             backdrop-filter: blur(5px);
         }
 
-        .music-button:hover {
+        .turn-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 0 20px rgba(100, 229, 255, 0.8);
             background: rgba(255, 255, 255, 0.2);
         }
 
-        .hero {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 60px 0;
-            gap: 40px;
+        .turn-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
-        .hero-content {
-            flex: 1;
-        }
-
-        .hero-image {
-            flex: 1;
+        .page-indicators {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
             display: flex;
             justify-content: center;
-            perspective: 1000px;
+            gap: 15px;
+            z-index: 100;
         }
 
-        .hero-image .image-container {
-            width: 360px;
-            height: 360px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            position: relative;
-            transform-style: preserve-3d;
+        .page-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-indicator.active {
+            background: #64e5ff;
+            box-shadow: 0 0 10px #64e5ff;
+        }
+
+        .profile-image {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto 30px;
             box-shadow: 0 0 25px rgba(100, 229, 255, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            border: 2px solid rgba(100, 229, 255, 0.3);
             overflow: hidden;
-            transition: all 0.4s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-        }
-        
-        .hero-image .image-container:hover {
-            transform: scale(1.05) rotate(3deg);
-            box-shadow: 0 0 35px rgba(100, 229, 255, 0.8);
-        }
-        
-        .hero-image .image-container img {
-            transition: all 0.5s ease;
-        }
-        
-        .hero-image .image-container:hover img {
-            transform: scale(1.1);
         }
 
-        .hero-title {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            background: linear-gradient(90deg, #64e5ff, #2a93d5);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            text-shadow: 0 0 10px rgba(100, 229, 255, 0.5);
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .hero-subtitle {
-            font-size: 18px;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            color: #e0e0e0;
-        }
-
-        .gradient-bar {
-            height: 6px;
-            width: 100px;
-            background: linear-gradient(90deg, #64e5ff, #2a93d5);
-            margin-bottom: 30px;
-            border-radius: 3px;
-            box-shadow: 0 0 15px rgba(100, 229, 255, 0.7);
-        }
-
-        .services {
-            padding: 60px 0;
-            position: relative;
-        }
-
-        .section-title {
-            font-size: 36px;
-            font-weight: 600;
-            margin-bottom: 20px;
+        .about-content {
             text-align: center;
-            background: linear-gradient(90deg, #64e5ff, #2a93d5);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            text-shadow: 0 0 10px rgba(100, 229, 255, 0.5);
+            line-height: 1.8;
+            color: #e0e0e0;
+            font-size: 20px;
         }
 
         .service-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
-            margin-top: 50px;
+            margin-top: 30px;
         }
 
         .service-card {
@@ -314,6 +330,7 @@
             overflow: hidden;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
         }
 
         .service-card:hover {
@@ -322,14 +339,14 @@
         }
 
         .service-icon {
-            font-size: 36px;
+            font-size: 40px;
             margin-bottom: 20px;
             color: #64e5ff;
             text-shadow: 0 0 10px rgba(100, 229, 255, 0.8);
         }
 
         .service-title {
-            font-size: 22px;
+            font-size: 26px;
             margin-bottom: 15px;
             font-weight: 600;
             color: #fff;
@@ -338,31 +355,28 @@
         .service-description {
             color: #e0e0e0;
             line-height: 1.6;
-        }
-
-        .contact {
-            padding: 60px 0;
-            text-align: center;
+            font-size: 18px;
         }
 
         .social-container {
             display: flex;
-            justify-content: center;
             flex-wrap: wrap;
-            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
             margin-top: 40px;
-            padding: 0 20px;
         }
 
         .social-box {
             background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 50%;
-            width: 70px;
-            height: 70px;
+            padding: 25px;
+            border-radius: 15px;
+            width: 160px;
+            height: 160px;
             text-align: center;
             transition: all 0.4s ease;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
@@ -379,8 +393,9 @@
         }
 
         .social-box .icon {
-            font-size: 28px;
+            font-size: 50px;
             color: #fff;
+            margin-bottom: 10px;
             transition: all 0.3s ease;
         }
 
@@ -390,16 +405,105 @@
             text-shadow: 0 0 10px rgba(100, 229, 255, 0.8);
         }
 
+        .social-box .social-name {
+            color: #e0e0e0;
+            font-size: 20px;
+        }
+
         .social-box a {
             text-decoration: none;
             color: inherit;
-            display: block;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             width: 100%;
             height: 100%;
+            justify-content: center;
+        }
+
+        .music-control {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            z-index: 100;
+        }
+
+        .music-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(100, 229, 255, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .music-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(100, 229, 255, 0.8);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .audio-player {
             display: none;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #64e5ff, #2a93d5);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(100, 229, 255, 0.5);
+            z-index: 100;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .page.animate-slide-in-left {
+            animation: slideInLeft 0.6s ease-out forwards;
+        }
+
+        .page.animate-slide-out-left {
+            animation: slideOutLeft 0.6s ease-out forwards;
+        }
+
+        .page.animate-slide-in-right {
+            animation: slideInRight 0.6s ease-out forwards;
+        }
+
+        .page.animate-slide-out-right {
+            animation: slideOutRight 0.6s ease-out forwards;
         }
     </style>
 </head>
@@ -421,81 +525,121 @@
         <p class="error-message">Even your phone in desktop mode can't handle this. Crypto isn't meant to be viewed through a keyhole!</p>
     </div>
 
-    <div class="desktop-content" id="desktopContent">
-        <div class="container glass-container">
-            <header>
-                <div class="logo">Zun</div>
-                <button class="music-button" id="musicToggle">
-                    <i class="fas fa-music"></i> Music
-                </button>
-            </header>
+    <div class="book-container" id="bookContainer">
+        <div class="logo">Zun</div>
+        
+        <div class="music-control">
+            <button class="music-button" id="musicToggle">
+                <i class="fas fa-music"></i> Music
+            </button>
+        </div>
 
-            <section class="hero">
-                <div class="hero-content">
+        <div class="book" id="book">
+            <div class="page active" id="page1">
+                <div class="page-content">
                     <div class="gradient-bar"></div>
-                    <h1 class="hero-title">I'm Zun</h1>
-                    <p class="hero-subtitle">I'm a crypto content creator, primarily sharing insights on Twitter. My mission is to empower web3 people with the knowledge and tools they need to navigate the fast-paced crypto space confidently. I research and break down complex crypto topics into simple, actionable insights so that more people can understand and benefit from the ecosystem.</p>
-                </div>
-                <div class="hero-image">
-                    <div class="image-container">
-                        <img src="pfp.png" alt="Crypto Content Creator" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
+                    <h1 class="page-title">I'm Zun</h1>
+                    <div class="profile-image">
+                        <img src="pfp.png" alt="Crypto Content Creator" style="opacity: 0.8;">
                     </div>
+                    <h2 class="page-subtitle">Crypto Content Creator</h2>
+                    <p class="page-subtitle">Empowering Web3 Community</p>
                 </div>
-            </section>
+            </div>
 
-            <section class="services">
-                <h2 class="section-title">What I Do</h2>
-                <div class="service-grid">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <i class="fas fa-rocket"></i>
-                        </div>
-                        <h3 class="service-title">Project Discovery & Education</h3>
-                        <p class="service-description">I identify promising early-stage crypto projects and break down their technology, use cases, funding sources and the problems they solve in an easy-to-understand way.</p>
-                    </div>
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <i class="fas fa-server"></i>
-                        </div>
-                        <h3 class="service-title">Node Setup Guides</h3>
-                        <p class="service-description">I provide detailed step-by-step guides to set up and run nodes for various crypto projects, making the process simple even for non-technical users.</p>
+            <div class="page" id="page2">
+                <div class="page-content">
+                    <h1 class="page-title">About Me</h1>
+                    <div class="gradient-bar"></div>
+                    <div class="about-content">
+                        <p>I'm a crypto content creator, primarily sharing insights on Twitter. My mission is to empower web3 people with the knowledge and tools they need to navigate the fast-paced crypto space confidently.</p>
+                        <br>
+                        <p>I research and break down complex crypto topics into simple, actionable insights so that more people can understand and benefit from the ecosystem. With years of experience in blockchain technology and decentralized finance, I aim to bridge the knowledge gap and make crypto accessible to everyone.</p>
+                        <br>
+                        <p>My content focuses on educating newcomers and experienced traders alike, providing clear explanations of emerging projects, market trends, and technological developments in the web3 space.</p>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section class="contact">
-                <h2 class="section-title">Connect With Me</h2>
-                <div class="social-container">
-                    <div class="social-box">
-                        <a href="mailto:zunxbt@gmail.com">
-                            <div class="icon">
-                                <i class="fas fa-envelope"></i>
+            <div class="page" id="page3">
+                <div class="page-content">
+                    <h1 class="page-title">What I Do</h1>
+                    <div class="gradient-bar"></div>
+                    <div class="service-grid">
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-rocket"></i>
                             </div>
-                        </a>
-                    </div>
-                    <div class="social-box">
-                        <a href="https://x.com/Zun2025" target="_blank">
-                            <div class="icon">
-                                <i class="fab fa-x-twitter"></i>
+                            <h3 class="service-title">Crypto Education</h3>
+                            <p class="service-description">I identify promising early-stage crypto projects and break down their technology, use cases, funding sources and the problems they solve in an easy-to-understand way.</p>
+                        </div>
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-server"></i>
                             </div>
-                        </a>
-                    </div>
-                    <div class="social-box">
-                        <a href="https://t.me/ZunXBT" target="_blank">
-                            <div class="icon">
-                                <i class="fab fa-telegram"></i>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="social-box">
-                        <a href="https://github.com/zunxbt" target="_blank">
-                            <div class="icon">
-                                <i class="fab fa-github"></i>
-                            </div>
-                        </a>
+                            <h3 class="service-title">Node Setup Guides</h3>
+                            <p class="service-description">I provide detailed step-by-step guides to set up and run nodes for various crypto projects, making the process simple even for non-technical users.</p>
+                        </div>
                     </div>
                 </div>
-            </section>
+            </div>
+
+            <div class="page" id="page4">
+                <div class="page-content">
+                    <h1 class="page-title">Connect With Me</h1>
+                    <div class="gradient-bar"></div>
+                    <div class="social-container">
+                        <div class="social-box">
+                            <a href="mailto:zunxbt@gmail.com">
+                                <div class="icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="social-name">Email</div>
+                            </a>
+                        </div>
+                        <div class="social-box">
+                            <a href="https://x.com/Zun2025" target="_blank">
+                                <div class="icon">
+                                    <i class="fab fa-x-twitter"></i>
+                                </div>
+                                <div class="social-name">Twitter</div>
+                            </a>
+                        </div>
+                        <div class="social-box">
+                            <a href="https://t.me/ZunXBT" target="_blank">
+                                <div class="icon">
+                                    <i class="fab fa-telegram"></i>
+                                </div>
+                                <div class="social-name">Telegram</div>
+                            </a>
+                        </div>
+                        <div class="social-box">
+                            <a href="https://github.com/zunxbt" target="_blank">
+                                <div class="icon">
+                                    <i class="fab fa-github"></i>
+                                </div>
+                                <div class="social-name">GitHub</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-indicators" id="pageIndicators">
+            <div class="page-indicator active" data-page="1"></div>
+            <div class="page-indicator" data-page="2"></div>
+            <div class="page-indicator" data-page="3"></div>
+            <div class="page-indicator" data-page="4"></div>
+        </div>
+
+        <div class="turn-buttons">
+            <button class="turn-btn disabled" id="prevBtn">
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <button class="turn-btn" id="nextBtn">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
         </div>
 
         <audio id="audioPlayer" class="audio-player">
@@ -506,7 +650,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const mobileError = document.getElementById('mobileError');
-            const desktopContent = document.getElementById('desktopContent');
+            const bookContainer = document.getElementById('bookContainer');
+            const pages = document.querySelectorAll('.page');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageIndicators = document.querySelectorAll('.page-indicator');
+            
+            let currentPage = 1;
+            let totalPages = pages.length;
+            let isAnimating = false;
             
             function isDesktop() {
                 return window.innerWidth >= 1024 && (window.innerWidth / window.innerHeight) > 1.2;
@@ -515,15 +667,77 @@
             function checkDevice() {
                 if (isDesktop()) {
                     mobileError.style.display = 'none';
-                    desktopContent.style.display = 'block';
+                    bookContainer.style.display = 'flex';
                 } else {
                     mobileError.style.display = 'flex';
-                    desktopContent.style.display = 'none';
+                    bookContainer.style.display = 'none';
                 }
             }
             
-            checkDevice();
-            window.addEventListener('resize', checkDevice);
+            function updateButtons() {
+                prevBtn.classList.toggle('disabled', currentPage === 1);
+                nextBtn.classList.toggle('disabled', currentPage === totalPages);
+            }
+            
+            function updateIndicators() {
+                pageIndicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index + 1 === currentPage);
+                });
+            }
+            
+            function goToPage(pageNum) {
+                if (isAnimating || pageNum === currentPage) return;
+                
+                isAnimating = true;
+                
+                const currentPageElem = document.getElementById(`page${currentPage}`);
+                const nextPageElem = document.getElementById(`page${pageNum}`);
+                
+                if (pageNum > currentPage) {
+                    currentPageElem.classList.add('animate-slide-out-left');
+                    nextPageElem.classList.add('animate-slide-in-right');
+                } else {
+                    currentPageElem.classList.add('animate-slide-out-right');
+                    nextPageElem.classList.add('animate-slide-in-left');
+                }
+                
+                setTimeout(() => {
+                    currentPageElem.classList.remove('active', 'animate-slide-out-left', 'animate-slide-out-right');
+                    nextPageElem.classList.add('active');
+                    nextPageElem.classList.remove('animate-slide-in-right', 'animate-slide-in-left');
+                    currentPage = pageNum;
+                    updateButtons();
+                    updateIndicators();
+                    isAnimating = false;
+                }, 600);
+            }
+            
+            pageIndicators.forEach(indicator => {
+                indicator.addEventListener('click', function() {
+                    const pageNum = parseInt(this.getAttribute('data-page'));
+                    goToPage(pageNum);
+                });
+            });
+            
+            prevBtn.addEventListener('click', function() {
+                if (currentPage > 1 && !isAnimating) {
+                    goToPage(currentPage - 1);
+                }
+            });
+            
+            nextBtn.addEventListener('click', function() {
+                if (currentPage < totalPages && !isAnimating) {
+                    goToPage(currentPage + 1);
+                }
+            });
+            
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'ArrowLeft' && currentPage > 1 && !isAnimating) {
+                    goToPage(currentPage - 1);
+                } else if (event.key === 'ArrowRight' && currentPage < totalPages && !isAnimating) {
+                    goToPage(currentPage + 1);
+                }
+            });
             
             const songs = [
                 'animal.mp3',
@@ -569,6 +783,11 @@
                     playSong(currentSongIndex);
                 });
             }
+            
+            checkDevice();
+            window.addEventListener('resize', checkDevice);
+            updateButtons();
+            updateIndicators();
         });
     </script>
 </body>
